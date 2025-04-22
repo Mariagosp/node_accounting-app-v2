@@ -3,11 +3,18 @@
 const supertest = require('supertest');
 const { createServer } = require('../src/createServer');
 
+const data = require('../src/data');
+
 describe('User', () => {
   let server;
   let api;
 
+  beforeAll(() => {
+    data.users = [];
+  });
+
   beforeEach(() => {
+    // data.users = [];
     server = createServer();
     api = supertest(server);
   });
