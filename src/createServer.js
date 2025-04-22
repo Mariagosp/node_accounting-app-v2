@@ -25,7 +25,9 @@ function createServer() {
     const { name } = req.body;
 
     if (!name) {
-      return res.status(400).json({ message: 'Missing required parameter: name' });
+      return res
+        .status(400)
+        .json({ message: 'Missing required parameter: name' });
     }
 
     const newUser = {
@@ -43,7 +45,9 @@ function createServer() {
     // const { id } = req.params;
 
     if (!id) {
-      return res.status(400).json({ message: 'Missing required parameter: id' });
+      return res
+        .status(400)
+        .json({ message: 'Missing required parameter: id' });
     }
 
     const user = data.users.find((us) => us.id === id);
@@ -63,7 +67,6 @@ function createServer() {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
 
     data.users = data.users.filter((user) => user.id !== id);
 
