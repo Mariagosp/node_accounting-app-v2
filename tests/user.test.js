@@ -3,45 +3,17 @@
 const supertest = require('supertest');
 const { createServer } = require('../src/createServer');
 
-const data = require('../src/data');
-
 describe('User', () => {
   let server;
   let api;
 
-  beforeAll(() => {
-    data.users = [];
-  });
+  // beforeAll(() => {
+  //   data.users = [];
+  // });
 
   beforeEach(() => {
-    // data.users = [];
     server = createServer();
     api = supertest(server);
-  });
-
-  describe('createUser', () => {
-    it('should create a new user', async () => {
-      const name = 'John Doe';
-
-      const response = await api
-        .post('/users')
-        .send({
-          name,
-        })
-        .expect(201)
-        .expect('Content-Type', /application\/json/);
-
-      expect(response.body).toEqual(
-        expect.objectContaining({
-          id: expect.any(Number),
-          name,
-        }),
-      );
-    });
-
-    it('should return 400 if name is not provided', async () => {
-      await api.post('/users').send({}).expect(400);
-    });
   });
 
   describe('getUsers', () => {
@@ -85,6 +57,31 @@ describe('User', () => {
     });
   });
 
+  describe('createUser', () => {
+    it('should create a new user', async () => {
+      const name = 'John Doe';
+
+      const response = await api
+        .post('/users')
+        .send({
+          name,
+        })
+        .expect(201)
+        .expect('Content-Type', /application\/json/);
+
+      expect(response.body).toEqual(
+        expect.objectContaining({
+          id: expect.any(Number),
+          name,
+        }),
+      );
+    });
+
+    it('should return 400 if name is not provided', async () => {
+      await api.post('/users').send({}).expect(400);
+    });
+  });
+
   describe('getUser', () => {
     it('should return 404 if user does not exist', async () => {
       await api.get('/users/1').expect(404);
@@ -114,7 +111,7 @@ describe('User', () => {
   describe('updateUser', () => {
     it('should return 404 if user does not exist', async () => {
       await api
-        .put('/users/1')
+        .patch('/users/1')
         .send({
           name: 'John Doe',
         })

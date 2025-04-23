@@ -1,96 +1,140 @@
 'use strict';
 
 // const { v4: uuidv4 } = require('uuid');
-
-let currentId = 0;
-// import express from 'express';
-// import cors from 'cors';
-
 const express = require('express');
-const data = require('./data');
+
+const cors = require('cors');
+const { resetUsers } = require('../src/services/users.service');
+
+const { usersRouter } = require('./routers/users.router');
+const { expensesRouter } = require('./routers/expenses.router');
+const { resetExpenses } = require('./services/expenses.services');
 
 function createServer() {
+  resetUsers();
+  resetExpenses();
+
   const app = express();
 
   app.use(express.json());
-  // app.use(cors());
+  app.use(cors());
 
-  app.get('/users', (req, res) => {
-    // res.statusCode = 200;
-    // res.send = data.users;
-    res.status(200).json(data.users);
-  });
+  app.use('/users', usersRouter);
+  app.use('/expenses', expensesRouter);
 
-  app.post('/users', (req, res) => {
-    const { name } = req.body;
+  // app.get('/expenses', (req, res) => {
+  //   let { userId, categories, from, to } = req.query;
 
-    if (!name) {
-      return res
-        .status(400)
-        .json({ message: 'Missing required parameter: name' });
-    }
+  //   if (!userId || isNaN(+userId)) {
+  //     return res.status(400).json({ message: 'Invalid or missing userId' });
+  //   }
 
-    const newUser = {
-      id: currentId++,
-      name,
-    };
+  //   let filtered = data.expenses.filter((exp) => exp.userId === +userId);
 
-    data.users = [...data.users, newUser];
+  //   if (categories) {
+  //     const catArray = Array.isArray(categories) ? categories : [categories];
+  //     filtered = filtered.filter((exp) => catArray.includes(exp.category));
+  //   }
 
-    res.status(201).json(newUser);
-  });
+  //   if (from) {
+  //     const fromDate = new Date(from);
+  //     if (isNaN(fromDate)) {
+  //       return res.status(400).json({ message: 'Invalid "from" date' });
+  //     }
+  //     filtered = filtered.filter((exp) => new Date(exp.spentAt) >= fromDate);
+  //   }
 
-  app.get(`/users/:id`, (req, res) => {
-    const id = req.params.id;
-    // const { id } = req.params;
+  //   if (to) {
+  //     const toDate = new Date(to);
+  //     if (isNaN(toDate)) {
+  //       return res.status(400).json({ message: 'Invalid "to" date' });
+  //     }
+  //     filtered = filtered.filter((exp) => new Date(exp.spentAt) <= toDate);
+  //   }
 
-    if (!id) {
-      return res
-        .status(400)
-        .json({ message: 'Missing required parameter: id' });
-    }
+  //   res.status(200).json(filtered || []);
+  // });
 
-    const user = data.users.find((us) => us.id === id);
+  // app.post('/expenses', (req, res) => {
+  //   const { userId, spentAt, title, amount, category, note } = req.body;
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+  //   if (!userId || !spentAt || !title || !amount || !category || !note) {
+  //     return res.status(400).json({ message: 'Invalid data' });
+  //   }
 
-    res.status(200).json(user);
-  });
+  //   const userExists = data.users.find((user) => user.id === userId);
+  //   if (!userExists) {
+  //     return res.status(400).json({ message: 'User not found' });
+  //   }
 
-  app.delete('/users/:id', (req, res) => {
-    const { id } = req.params;
+  //   const newExpense = {
+  //     id: data.expenses.length + 1,
+  //     userId,
+  //     spentAt,
+  //     title,
+  //     amount,
+  //     category,
+  //     note,
+  //   };
+  //   data.expenses.push(newExpense);
+  //   res.status(201).json(newExpense);
+  // });
 
-    const user = data.users.find((user) => user.id === id);
+  // app.get('/expenses/:id', (req, res) => {
+  //   const id = req.params.id;
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+  //   if (!id) {
+  //     return res.status(400);
+  //   }
 
-    data.users = data.users.filter((user) => user.id !== id);
+  //   const expense = data.expenses.find((exp) => exp.id === +id);
 
-    res.sendStatus(204);
-  });
+  //   if (!expense) {
+  //     return res.status(400).send('Bad request');
+  //   }
 
-  app.patch('/users/:id', (req, res) => {
-    const id = req.params.id;
-    const { name } = req.body;
+  //   res.status(200).json(expense);
+  // });
 
-    if (!id || !name) {
-      return res.status(400).json({ message: 'Missing required parameter' });
-    }
+  // app.delete('/expenses/:id', (req, res) => {
+  //   const id = req.params.id;
 
-    const user = data.users.find((user) => user.id === id);
+  //   const expense = data.expenses.find((exp) => exp.id === +id);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+  //   if (!expense) {
+  //     return res.status(404);
+  //   }
 
-    user.name = name;
+  //   data.expenses = data.expenses.filter((exp) => exp.id !== +id);
 
-    res.status(200).json(user);
-  });
+  //   res.status(204);
+  // });
+
+  // app.patch('/expenses/:id', (req, res) => {
+  //   const id = req.params.id;
+  //   const { spentAt, title, amount, category, note } = req.body;
+
+  //   if (!id || !spentAt || !title || !amount || !category || !note) {
+  //     return res.status(400);
+  //   }
+
+  //   let foundExpense = data.expenses.find((exp) => exp.id === +id);
+
+  //   if (!foundExpense) {
+  //     return res.status(404);
+  //   }
+
+  //   foundExpense = {
+  //     ...foundExpense,
+  //     spentAt,
+  //     title,
+  //     amount,
+  //     category,
+  //     note,
+  //   };
+
+  //   res.status(200).json(foundExpense);
+  // });
 
   return app;
 }
