@@ -1,4 +1,12 @@
-const { getAll, add, get, remove, update } = require("../services/expenses.services");
+const {
+  getAll,
+  add,
+  get,
+  remove,
+  update,
+} = require('../services/expenses.services');
+
+const expensesService = require('../services/expenses.services');
 
 const getExpenses = (req, res) => {
   // let { userId, categories, from, to } = req.query;
@@ -37,14 +45,30 @@ const getExpenses = (req, res) => {
   const allExpenses = getAll(queries);
 
   return res.status(200).send(allExpenses);
-}
+};
 
 const createExpense = (req, res) => {
-  const queries = req.query;
+  const queries = req.body;
+  const { userId, spentAt, title, amount, category, note } = queries;
+
+  if (
+    userId === undefined ||
+    spentAt === undefined ||
+    title === undefined ||
+    amount === undefined ||
+    category === undefined
+  ) {
+    return res.status(400).send('Some of props are not filled');
+  }
+
   const newExpense = add(queries);
 
+  if (!newExpense) {
+    res.sendStatus(400);
+  }
+
   res.status(201).json(newExpense);
-}
+};
 
 const getExpense = (req, res) => {
   const { id } = req.params;
@@ -56,11 +80,11 @@ const getExpense = (req, res) => {
   const expense = get(+id);
 
   if (!expense) {
-    return res.status(400).send('Bad request');
+    return res.status(404).send('Not Found');
   }
 
   res.status(200).json(expense);
-}
+};
 
 const removeExpense = (req, res) => {
   const id = req.params.id;
@@ -68,32 +92,36 @@ const removeExpense = (req, res) => {
   const expense = remove(+id);
 
   if (!expense) {
-    return res.status(404);
+    return res.status(404).send('Not found');
   }
 
-  res.status(204);
-}
+  res.status(204).send();
+};
 
 const updateExpense = (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
   const expense = req.body;
 
   if (!id || isNaN(+id)) {
-    return res.status(400).send('Bad request');
+    return res.status(400).send('Bad request2');
   }
 
   if (Object.keys(expense).length === 0) {
+    return res.status(400).send('Bad request1');
+  }
+
+  if (!expensesService.get(+id)) {
     return res.status(404).send('Not found');
   }
 
   let foundExpense = update(+id, expense);
 
-  if (!foundExpense) {
-    return res.status(404);
-  }
+  // if (!foundExpense) {
+  //   return res.status(404).send('Not found');
+  // }
 
   res.status(200).json(foundExpense);
-}
+};
 
 module.exports = {
   getExpenses,
@@ -101,4 +129,4 @@ module.exports = {
   getExpense,
   removeExpense,
   updateExpense,
-}
+};

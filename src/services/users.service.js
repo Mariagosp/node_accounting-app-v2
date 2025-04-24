@@ -23,7 +23,7 @@ const add = (name) => {
 }
 
 const get = (id) => {
-  const foundUser = users.find(user => user.id === id);
+  const foundUser = users.find(user => user.id === +id);
 
   if (!foundUser) {
     return false;
@@ -33,7 +33,7 @@ const get = (id) => {
 }
 
 const remove = (id) => {
-  const foundIndex = users.findIndex(user => user.id === id);
+  const foundIndex = users.findIndex(user => user.id === +id);
 
   if (foundIndex < 0) {
     return false;
@@ -45,7 +45,7 @@ const remove = (id) => {
 }
 
 const update = (id, name) => {
-  const userToUpdate = get(id);
+  const userToUpdate = get(+id);
 
   if (!userToUpdate) {
     return false;
